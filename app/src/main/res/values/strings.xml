@@ -1,0 +1,19 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Smart Alarm</string>
+
+    // list question
+    <string-array name="list_question">
+        <item>
+            <string name="query">1 + 1 = ?</string>
+            <string-array name="answer">
+                <item>0</item>
+                <item>1</item>
+                <item>2</item>
+                <item>3</item>
+            </string-array>
+            <string name="rightAnswer">2</string>
+        </item>
+
+
+    </string-array>
+</resources>

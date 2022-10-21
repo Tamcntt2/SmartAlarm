@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TimePicker
+        android:id="@+id/timePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:headerBackground="@color/bg_dialog_add"
+        android:timePickerMode="clock"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="10dp"
+        android:text="Choose Ringtone" />
+
+    <Spinner
+        android:id="@+id/spinnerRingtone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="20dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="20dp">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_weight="1"
+            android:backgroundTint="@android:color/darker_gray"
+            android:text="Cancel"
+            android:id="@+id/buttonCancel"/>
+
+        <Button
+            android:layout_marginLeft="20dp"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_weight="1"
+            android:backgroundTint="@color/bg_dialog_add"
+            android:text="Save"
+            android:id="@+id/buttonSave"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>
