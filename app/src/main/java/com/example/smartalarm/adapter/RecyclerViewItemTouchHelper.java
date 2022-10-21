@@ -1,4 +1,4 @@
-package com.example.smartalarm;
+package com.example.smartalarm.adapter;
 
 import android.graphics.Canvas;
 import android.view.View;
@@ -7,8 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.smartalarm.adapter.AlarmAdapter;
 
 public class RecyclerViewItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 

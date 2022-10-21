@@ -19,8 +19,8 @@ public interface AlarmDAO {
     @Query("SELECT * FROM alarm ORDER BY id")
     List<Alarm> getListAlarm();
 
-    @Query("SELECT * FROM alarm WHERE calendar= :calendar")
-    List<Alarm> checkAlarm(Calendar calendar);
+    @Query("SELECT * FROM alarm WHERE id= :id")
+    List<Alarm> checkAlarm(String id);
 
     @Delete
     void deleteAlarm(Alarm alarm);

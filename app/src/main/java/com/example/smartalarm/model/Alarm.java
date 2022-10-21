@@ -11,24 +11,15 @@ import java.util.Calendar;
 @Entity(tableName = "alarm")
 public class Alarm {
     @NonNull
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = false)
     public String id;
     private Calendar calendar;
     private boolean isStatus;
-    MediaPlayer mediaPlayer;
 
     public Alarm(String id, Calendar calendar, boolean isStatus) {
         this.id = id;
         this.calendar = calendar;
         this.isStatus = isStatus;
-    }
-
-    public MediaPlayer getMediaPlayer() {
-        return mediaPlayer;
-    }
-
-    public void setMediaPlayer(MediaPlayer mediaPlayer) {
-        this.mediaPlayer = mediaPlayer;
     }
 
     public boolean isStatus() {

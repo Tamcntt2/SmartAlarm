@@ -1,33 +1,44 @@
-package com.example.smartalarm;
+package com.example.smartalarm.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.room.Database;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.example.smartalarm.adapter.ItemTouchHelperListener;
+import com.example.smartalarm.R;
+import com.example.smartalarm.adapter.RecyclerViewItemTouchHelper;
 import com.example.smartalarm.adapter.AlarmAdapter;
 import com.example.smartalarm.database.AlarmConverter;
 import com.example.smartalarm.database.AlarmDatabase;
 import com.example.smartalarm.model.Alarm;
 import com.example.smartalarm.receiver.AlarmReceiver;
 import com.google.android.material.snackbar.Snackbar;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -117,7 +128,17 @@ public class MainActivity extends AppCompatActivity implements ItemTouchHelperLi
                 Toast.makeText(MainActivity.this, "Test set alarm success!", Toast.LENGTH_SHORT).show();
             }
         });
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // share preference
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String path = sharedPreferences.getString("Ringtone", "");
+        if(!path.isEmpty()) {
+            RingtoneManager.getRingtone(this, Uri.parse(path)).play();
+        }
     }
 
     private void showDialogAdd() {
@@ -147,10 +168,34 @@ public class MainActivity extends AppCompatActivity implements ItemTouchHelperLi
                 dialog.dismiss();
             }
         });
+
+        // ringtone
+//        Spinner spnRingtone = (Spinner) dialog.findViewById(R.id.spinnerRingtone);
+//        spnRingtone.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                showDialogRingtone();
+//            }
+//        });
+        TextView tvRingtone = (TextView) dialog.findViewById(R.id.textViewRingtone);
+        tvRingtone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showDialogRingtone();
+            }
+        });
+    }
+
+    private void showDialogRingtone() {
+//        Intent i = new Intent(this, RingtoneActivity.class);
+//        startActivity(i);
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.activity_ringtone);
+        dialog.show();
     }
 
     private void addItemNewAlarm(Calendar calendar) {
-        // so sanh voi thoi gian hien tai
+        // so sanh voi thoi gian hien tai -> giu nguyen/ tang 1 ngay
         Date dateNew = calendar.getTime();
         Calendar calendarCurrent = Calendar.getInstance();
         Date dateCurrent = calendarCurrent.getTime();
@@ -158,30 +203,27 @@ public class MainActivity extends AppCompatActivity implements ItemTouchHelperLi
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
 
-        // lay vi tri sau khi sap xep va kiem tra xem no co ton tai chua
-        // get position after sorting
-        int pos = 0;
-        boolean check = true;
+        // kiem tra da ton tai chua
+        String stringId = AlarmConverter.fromCalendar(calendar).toString();
+        if (!AlarmDatabase.getInstance(this).alarmDAO().checkAlarm(stringId).isEmpty()) {
+            return;
+        }
+
+        // lay vi tri sau khi chen
+        int position = 0;
         for (int i = 0; i < listAlarm.size(); i++) {
-            Calendar calendar1 = listAlarm.get(i).getCalendar();
-            Date date1 = calendar1.getTime();
-            dateNew = calendar.getTime();
-            if (date1.compareTo(dateNew) < 0) {
-                pos = i + 1;
-            } else if (date1.compareTo(dateNew) == 0) {
-                pos = i;
-                check = false;
+            if (listAlarm.get(i).id.compareTo(stringId) > 0) {
+                position = i;
                 break;
             }
         }
 
+        // add
         Alarm newAlarm = new Alarm(AlarmConverter.fromCalendar(calendar).toString(), calendar, true);
-        if (check) {
-            listAlarm.add(pos, newAlarm);
-            // insert room
-            AlarmDatabase.getInstance(this).alarmDAO().insertAlarm(newAlarm);
-        }
+        AlarmDatabase.getInstance(this).alarmDAO().insertAlarm(newAlarm);
+        listAlarm.add(position, newAlarm);
         alarmAdapter.notifyDataSetChanged();
+
     }
 
     private List<Alarm> getDataAlarm() {
@@ -195,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements ItemTouchHelperLi
             int indexDelete = viewHolder.getAdapterPosition();
             Alarm alarmDelete = listAlarm.get(indexDelete);
 
-            alarmAdapter.removeItem(indexDelete, alarmDelete);
+            alarmAdapter.removeItem(alarmDelete, indexDelete);
 
             Snackbar snackbar = Snackbar.make(layoutRoot, "", Snackbar.LENGTH_SHORT);
             snackbar.setAction("Undo", new View.OnClickListener() {

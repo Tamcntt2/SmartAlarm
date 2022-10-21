@@ -1,4 +1,4 @@
-package com.example.smartalarm;
+package com.example.smartalarm.util;
 
 import java.text.SimpleDateFormat;
 

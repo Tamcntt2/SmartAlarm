@@ -55,7 +55,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         Calendar calendar = alarm.getCalendar();
         SimpleDateFormat formatHour = new SimpleDateFormat("hh:mm aa");
         String hour = formatHour.format(calendar.getTime());
-        if(calendar.get(Calendar.HOUR_OF_DAY) == 0) {
+        if (calendar.get(Calendar.HOUR_OF_DAY) == 0) {
             hour = "00" + hour.substring(2, 8);
         }
         holder.tvHour.setText(hour);
@@ -68,12 +68,14 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         day += formatDay.format(calendar.getTime());
         holder.tvDay.setText(day);
 
+        // update status
         holder.imgStatus.setImageResource(alarm.isStatus() ? R.drawable.clock_enable : R.drawable.clock_disable);
         holder.imgStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 alarm.setStatus(!alarm.isStatus());
                 holder.imgStatus.setImageResource(alarm.isStatus() ? R.drawable.clock_enable : R.drawable.clock_disable);
+                updateItem(alarm, position);
             }
         });
 
@@ -99,7 +101,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         timePicker.setHour(calendar.get(Calendar.HOUR_OF_DAY));
         timePicker.setMinute(calendar.get(Calendar.MINUTE));
 
-        // button
+        // button save, cancel
         Button btnCancel = dialog.findViewById(R.id.buttonCancel);
         Button btnSave = dialog.findViewById(R.id.buttonSave);
 
@@ -117,60 +119,65 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
                 Calendar calendarNew = Calendar.getInstance();
                 calendarNew.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
                 calendarNew.set(Calendar.MINUTE, timePicker.getMinute());
-                updateItem(calendarNew, position, alarm);
+                Alarm alarmSelected = new Alarm(AlarmConverter.fromCalendar(calendarNew).toString(), calendarNew, true);
+                updateItem(alarmSelected, position);
                 dialog.dismiss();
             }
         });
     }
 
-    private void updateItem(Calendar calendar, int position, Alarm alarm) {
-        removeItem(position, alarm);
-        addItem(calendar);
+    private void updateItem(Alarm alarm, int position) {
+        removeItem(alarm, position);
+        addItem(alarm);
     }
 
-    private void addItem(Calendar calendar) {
+    private void addItem(Alarm alarm) {
         // so sanh voi thoi gian hien tai -> tang ngay
+        Calendar calendar = alarm.getCalendar();
         Date dateNew = calendar.getTime();
         Calendar calendarCurrent = Calendar.getInstance();
         Date dateCurrent = calendarCurrent.getTime();
-        if(dateCurrent.compareTo(dateNew) > 0) {
+        if (dateCurrent.compareTo(dateNew) > 0) {
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
 
-        // lay vi tri sau khi sap xep va kiem tra xem no co ton tai chua
-        // get position after sorting
-        int pos = 0;
-        boolean check = true;
-        for(int i=0; i<listAlarm.size(); i++) {
-            Calendar calendar1 = listAlarm.get(i).getCalendar();
-            Date date1 = calendar1.getTime();
-            dateNew = calendar.getTime();
-            if(date1.compareTo(dateNew) < 0) {
-                pos = i+1;
-            } else if(date1.compareTo(dateNew) == 0) {
-                pos = i;
-                check = false;
+        // kiem tra da ton tai chua
+        String stringId = AlarmConverter.fromCalendar(calendar).toString();
+        if (!AlarmDatabase.getInstance(context).alarmDAO().checkAlarm(stringId).isEmpty()) {
+            return;
+        }
+
+        // lay vi tri sau khi chen
+        int position = 0;
+        for (int i = 0; i < listAlarm.size(); i++) {
+            if (listAlarm.get(i).id.compareTo(stringId) > 0) {
+                position = i;
                 break;
             }
         }
 
+        // add
         Alarm newAlarm = new Alarm(AlarmConverter.fromCalendar(calendar).toString(), calendar, true);
-        if (check) {
-            listAlarm.add(pos, newAlarm);
-            // insert room
-            AlarmDatabase.getInstance(context).alarmDAO().insertAlarm(newAlarm);
-        }
+        AlarmDatabase.getInstance(context).alarmDAO().insertAlarm(newAlarm);
+        listAlarm.add(position, newAlarm);
+
+
     }
 
-    public void removeItem(int position, Alarm alarm) {
+    public void removeItem(Alarm alarm, int position) {
         listAlarm.remove(position);
         AlarmDatabase.getInstance(context).alarmDAO().deleteAlarm(alarm);
         notifyItemRemoved(position);
     }
 
+    private List<Alarm> getDataAlarm() {
+        return AlarmDatabase.getInstance(context).alarmDAO().getListAlarm();
+    }
+
     public void undoItem(Alarm alarm, int position) {
         listAlarm.add(position, alarm);
         notifyItemInserted(position);
+        AlarmDatabase.getInstance(context).alarmDAO().insertAlarm(alarm);
     }
 
     @Override
