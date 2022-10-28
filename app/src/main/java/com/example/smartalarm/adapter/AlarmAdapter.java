@@ -185,7 +185,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
 
                 alarm.setTime(AlarmConverter.fromCalendar(calendarSelected));
                 updateItem(alarm);
-                notifyItemChanged(position);
+                notifyDataSetChanged();
 
                 if (ringtoneSelected.isPlaying()) {
                     ringtoneSelected.stop();
@@ -313,8 +313,20 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
 
         // update
         AlarmDatabase.getInstance(context).alarmDAO().updateAlarm(alarm);
+
         int position = findPositionFromIdAlarm(alarm.getId());
-        listAlarm.set(position, alarm);
+        listAlarm.remove(position);
+
+        int positionNew = 0;
+        for (int i = 0; i < listAlarm.size(); i++) {
+            if (listAlarm.get(i).getTime().compareTo(alarm.getTime()) < 0) {
+                position = i + 1;
+            } else {
+                break;
+            }
+        }
+        listAlarm.add(position, alarm);
+
         iAlarmManager.IAddItemAlarmManager(alarm);
     }
 }
