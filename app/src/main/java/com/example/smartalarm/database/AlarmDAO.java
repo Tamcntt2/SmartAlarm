@@ -28,9 +28,6 @@ public interface AlarmDAO {
     @Delete
     void deleteAlarm(Alarm alarm);
 
-    @Query("DELETE FROM alarm WHERE id= :id")
-    void deleteAlarmFromId(int id);
-
     @Update
     void updateAlarm(Alarm alarm);
 }

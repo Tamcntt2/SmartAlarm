@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smartalarm.R;
+import com.example.smartalarm.database.AlarmDatabase;
+import com.example.smartalarm.model.Alarm;
 import com.example.smartalarm.service.AlarmService;
 
 import java.util.List;
@@ -21,11 +23,13 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.AnswersV
     private Context context;
     private List<String> listAnswers;
     private String rightAnswer;
+    private int idAlarm;
 
-    public AnswersAdapter(Context context, List<String> listAnswers, String rightAnswer) {
+    public AnswersAdapter(Context context, List<String> listAnswers, String rightAnswer, int idAlarm) {
         this.context = context;
         this.listAnswers = listAnswers;
         this.rightAnswer = rightAnswer;
+        this.idAlarm = idAlarm;
     }
 
     @NonNull
@@ -46,12 +50,19 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.AnswersV
         holder.btnAnswer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(answer.equals(rightAnswer)) {
+                if (answer.equals(rightAnswer)) {
                     // turn off
                     Intent myIntent = new Intent(context, AlarmService.class);
                     context.startService(myIntent);
                     myIntent.putExtra("extra", false);
                     Toast.makeText(context, "Tắt báo thức thành công!", Toast.LENGTH_SHORT).show();
+
+                    if(idAlarm != -1) {
+                        Alarm alarm = AlarmDatabase.getInstance(context).alarmDAO().checkAlarmFromId(idAlarm).get(0);
+                        alarm.setEnabled(false);
+                        AlarmDatabase.getInstance(context).alarmDAO().updateAlarm(alarm);
+                    }
+
                     System.exit(0);
                 } else {
                     Toast.makeText(context, "Đáp án sai!", Toast.LENGTH_SHORT).show();

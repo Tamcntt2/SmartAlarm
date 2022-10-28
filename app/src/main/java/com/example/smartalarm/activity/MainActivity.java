@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements ItemTouchHelperLi
             Calendar calendar = AlarmConverter.toCalendar(alarm.getTime());
             intent.putExtra("extra", true);
             intent.putExtra("ringtone", alarm.getRingtoneTitle());
+            intent.putExtra("idAlarm", alarm.getId());
             PendingIntent pendingIntent = PendingIntent.getBroadcast(
                     MainActivity.this, alarm.getId(), intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE
             );

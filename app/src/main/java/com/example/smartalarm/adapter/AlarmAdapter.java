@@ -18,6 +18,7 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -98,7 +99,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
             @Override
             public void onClick(View view) {
                 showDialogUpdate(alarm, position);
-//                Toast.makeText(context, "" + alarm.getTime(), Toast.LENGTH_SHORT).show();
+                Log.d("Alarm id", alarm.getId() + " " + alarm.isEnabled());
             }
         });
     }
@@ -184,6 +185,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
                 calendarSelected.set(Calendar.MILLISECOND, 0);
 
                 alarm.setTime(AlarmConverter.fromCalendar(calendarSelected));
+                alarm.setEnabled(true);
                 updateItem(alarm);
                 notifyDataSetChanged();
 
@@ -264,6 +266,9 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
             // chua ton tai -> add room, list, alarm manager
             AlarmDatabase.getInstance(context).alarmDAO().insertAlarm(alarmNew);
 
+            listAlarmCheck = AlarmDatabase.getInstance(context).alarmDAO().checkAlarmFromTime(alarmNew.getTime());
+            alarmNew.setId(listAlarmCheck.get(0).getId());
+
             int position = 0;
             for (int i = 0; i < listAlarm.size(); i++) {
                 if (listAlarm.get(i).getTime().compareTo(alarmNew.getTime()) < 0) {
@@ -302,7 +307,6 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
     }
 
     public void updateItem(Alarm alarm) {
-        alarm.setEnabled(true);
         alarm = compareTimeCurrent(alarm);
 
         // Kiem tra time: da ton tai -> xoa alarm cu

@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.example.smartalarm.R;
@@ -34,9 +36,14 @@ public class QuestionActivity extends AppCompatActivity {
         TextView tvQuestion = (TextView) findViewById(R.id.textViewQuestion);
         tvQuestion.setText(questionRandom.getQuery());
 
+        // intent get id
+        Intent intent = getIntent();
+        int idAlarm = intent.getIntExtra("idAlarm", -1);
+        Log.d("Alarm id", idAlarm + "");
+
         // recycler view answer
         RecyclerView rcvAnswer = (RecyclerView) findViewById(R.id.recyclerViewAnswer) ;
-        AnswersAdapter answersAdapter = new AnswersAdapter(this, listAnswer, questionRandom.getRightAnswer());
+        AnswersAdapter answersAdapter = new AnswersAdapter(this, listAnswer, questionRandom.getRightAnswer(), idAlarm);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         rcvAnswer.setAdapter(answersAdapter);
         rcvAnswer.setLayoutManager(linearLayoutManager);

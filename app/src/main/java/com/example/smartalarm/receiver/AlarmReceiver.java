@@ -15,6 +15,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         boolean isStatus = intent.getBooleanExtra("extra", false);
         String ringtoneTitle = intent.getExtras().getString("ringtone", "Argon");
+        int idAlarm = intent.getIntExtra("idAlarm", -1);
 
         Calendar calendar = Calendar.getInstance();
         Log.d("Alarm time", calendar.get(Calendar.HOUR) + "-" + calendar.get(Calendar.MINUTE) + "-" +
@@ -23,6 +24,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         Intent myIntent = new Intent(context, AlarmService.class);
         myIntent.putExtra("extra", isStatus);
         myIntent.putExtra("ringtone", ringtoneTitle);
+        myIntent.putExtra("idAlarm", idAlarm);
         context.startService(myIntent);
     }
 }
