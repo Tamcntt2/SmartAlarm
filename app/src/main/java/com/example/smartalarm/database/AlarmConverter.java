@@ -7,14 +7,15 @@ import java.util.Date;
 
 public class AlarmConverter {
     @TypeConverter
-    public static Calendar toCalendar(Long dateLong){
+    public static Calendar toCalendar(String stringDate){
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date(dateLong));
-        return dateLong == null ? null : calendar;
+        long intDate = Long.parseLong(stringDate);
+        calendar.setTime(new Date(intDate));
+        return stringDate == null ? null : calendar;
     }
 
     @TypeConverter
-    public static Long fromCalendar(Calendar calendar){
-        return calendar == null ? null : calendar.getTime().getTime();
+    public static String fromCalendar(Calendar calendar){
+        return String.valueOf(calendar == null ? null : calendar.getTime().getTime());
     }
 }

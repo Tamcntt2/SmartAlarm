@@ -16,14 +16,20 @@ public interface AlarmDAO {
     @Insert
     void insertAlarm(Alarm alarm);
 
-    @Query("SELECT * FROM alarm ORDER BY id")
+    @Query("SELECT * FROM alarm ORDER BY time")
     List<Alarm> getListAlarm();
 
+    @Query("SELECT * FROM alarm WHERE time= :time")
+    List<Alarm> checkAlarmFromTime(String time);
+
     @Query("SELECT * FROM alarm WHERE id= :id")
-    List<Alarm> checkAlarm(String id);
+    List<Alarm> checkAlarmFromId(int id);
 
     @Delete
     void deleteAlarm(Alarm alarm);
+
+    @Query("DELETE FROM alarm WHERE id= :id")
+    void deleteAlarmFromId(int id);
 
     @Update
     void updateAlarm(Alarm alarm);

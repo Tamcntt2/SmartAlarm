@@ -1,28 +1,25 @@
 package com.example.smartalarm.service;
 
-import android.app.Dialog;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
 import com.example.smartalarm.R;
-import com.example.smartalarm.adapter.QuestionAdapter;
-import com.example.smartalarm.model.ListQuestion;
-import com.example.smartalarm.model.Question;
-
-import java.util.Arrays;
-import java.util.Random;
+import com.example.smartalarm.activity.QuestionActivity;
+import com.example.smartalarm.util.RingtoneUtils;
 
 public class AlarmService extends Service {
 
-    MediaPlayer mediaPlayer;
+    private boolean isStatus;
+    Ringtone ringtone;
 
     @Nullable
     @Override
@@ -32,38 +29,24 @@ public class AlarmService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String string = intent.getExtras().getString("extra");
-        boolean isStatus = string.equals("on") ? true : false;
-        if (isStatus) {
-            Toast.makeText(this, "Test Music success!", Toast.LENGTH_SHORT).show();
-//        return super.onStartCommand(intent, flags, startId);
-            mediaPlayer = MediaPlayer.create(this, R.raw.jingle_bells);
-            mediaPlayer.start();
-        } else {
-            mediaPlayer.stop();
-            mediaPlayer.reset();
+        isStatus = intent.getBooleanExtra("extra", false);
+        String ringtoneTitle = intent.getExtras().getString("ringtone", "Argon");
+
+        if (ringtone != null && ringtone.isPlaying()) {
+            ringtone.stop();
         }
 
-        // alert dialog -> question
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.dialog_question);
-        dialog.show();
-        Log.e("DIALOG", "SHOW DIALOG SUCCESS");
+        if (isStatus) {
+            RingtoneUtils ringtoneUtils = new RingtoneUtils(getApplicationContext());
+            String notificationUri = ringtoneUtils.getUriRingtoneFromTitle(ringtoneTitle);
+            ringtone = RingtoneManager.getRingtone(getApplicationContext(), Uri.parse(notificationUri));
+//            ringtone.setLooping(true);
+            ringtone.play();
 
-        // random questions
-        ListQuestion listQuestion = new ListQuestion();
-        Random random = new Random();
-        int indexQuestion = random.nextInt(listQuestion.listQuestions.size());
-        Log.e("DIALOG", "RANDOM " + indexQuestion);
-
-
-        // show question
-        TextView tvQuestion = (TextView) dialog.findViewById(R.id.textViewQuestion);
-        ListView lvAnswer = (ListView) dialog.findViewById(R.id.listViewAnswer);
-        Question questionSelected = listQuestion.getListQuestions().get(indexQuestion);
-        QuestionAdapter questionAdapter = new QuestionAdapter(this, R.layout.item_answer_question, Arrays.asList(questionSelected.getAnswer()), questionSelected.getRightAnswer());
-        Log.e("DIALOG", "SHOW QUESTION SUCCESS");
-
+            Intent intent1 = new Intent(this, QuestionActivity.class);
+            intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent1);
+        }
 
         return START_NOT_STICKY;
     }

@@ -8,6 +8,8 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.smartalarm.my_interface.ItemTouchHelperListener;
+
 public class RecyclerViewItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
     private ItemTouchHelperListener listener;

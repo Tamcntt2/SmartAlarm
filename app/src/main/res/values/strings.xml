@@ -1,19 +1,28 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Smart Alarm</string>
 
-    // list question
-    <string-array name="list_question">
-        <item>
-            <string name="query">1 + 1 = ?</string>
-            <string-array name="answer">
-                <item>0</item>
-                <item>1</item>
-                <item>2</item>
-                <item>3</item>
-            </string-array>
-            <string name="rightAnswer">2</string>
-        </item>
-
-
+    <string-array name="list_ringtone">
+        <item>Argon</item>
+        <item>Barium</item>
+        <item>BeeBeep Alarm</item>
+        <item>Beep-Beep-Beep Alarm</item>
+        <item>Buzzer Alarm</item>
+        <item>Carbon</item>
+        <item>Cesium</item>
+        <item>Fermium</item>
+        <item>Hassium</item>
+        <item>Helium</item>
+        <item>Krypton</item>
+        <item>Neon</item>
+        <item>Neptunium</item>
+        <item>Nobelium</item>
+        <item>Osmium</item>
+        <item>Oxygen</item>
+        <item>Piezo Alarm</item>
+        <item>Platinum</item>
+        <item>Platinum</item>
+        <item>Plutonium</item>
+        <item>Rooster Alarm</item>
+        <item>Scandium</item>
     </string-array>
 </resources>

@@ -1,4 +1,4 @@
-package com.example.smartalarm.adapter;
+package com.example.smartalarm.my_interface;
 
 import androidx.recyclerview.widget.RecyclerView;
 
