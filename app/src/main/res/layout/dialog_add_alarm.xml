@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:headerBackground="@color/bg_dialog_add"
-        android:timePickerMode="clock"/>
+        android:timePickerMode="clock" />
 
     <TextView
         android:id="@+id/textViewRingtone"
@@ -17,7 +17,8 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="10dp"
-        android:text="Choose Ringtone" />
+        android:text="Choose Ringtone"
+        android:textColor="@android:color/darker_gray"/>
 
     <Spinner
         android:id="@+id/spinnerRingtone"
@@ -41,6 +42,7 @@
             android:layout_weight="1"
             android:backgroundTint="@android:color/darker_gray"
             android:text="Cancel"
+            android:textColor="@color/white"
             android:id="@+id/buttonCancel"/>
 
         <Button
@@ -51,6 +53,7 @@
             android:layout_weight="1"
             android:backgroundTint="@color/bg_dialog_add"
             android:text="Save"
+            android:textColor="@color/white"
             android:id="@+id/buttonSave"/>
 
     </LinearLayout>

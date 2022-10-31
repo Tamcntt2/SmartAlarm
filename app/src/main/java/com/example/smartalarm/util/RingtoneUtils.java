@@ -56,4 +56,8 @@ public class RingtoneUtils {
     public String getUriRingtoneFromTitle(String title) {
         return mapRingtone.get(title);
     }
+
+    public String getRingtoneDefault() {
+        return listRingtone.get(0).getTitle();
+    }
 }

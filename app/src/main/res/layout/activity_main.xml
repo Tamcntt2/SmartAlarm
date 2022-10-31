@@ -2,10 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical"
-    android:id="@+id/layout"
     tools:context=".activity.MainActivity">
 
     <RelativeLayout
@@ -23,8 +24,8 @@
             android:paddingLeft="10dp"
             android:text="Alarm System"
             android:textColor="@color/black"
-            android:textStyle="bold"
-            android:textSize="18dp"/>
+            android:textSize="18dp"
+            android:textStyle="bold" />
 
         <ImageView
             android:id="@+id/imageViewAddAlarm"
@@ -41,7 +42,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycleViewAlarm"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
+        android:layout_height="wrap_content"
+        android:background="@android:color/darker_gray" />
 
 </LinearLayout>

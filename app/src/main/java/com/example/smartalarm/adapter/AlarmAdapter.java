@@ -2,6 +2,7 @@ package com.example.smartalarm.adapter;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -259,6 +260,10 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
 
     public void addItem(Alarm alarmNew) {
         alarmNew = compareTimeCurrent(alarmNew);
+
+        Calendar cal = AlarmConverter.toCalendar(alarmNew.getTime());
+        Log.d("Time Alarm Add", cal.get(Calendar.HOUR) + "-" + cal.get(Calendar.MINUTE) + "-" + cal.get(Calendar.SECOND) + "-" + cal.get(Calendar.MILLISECOND));
+
 
         // kiem tra ton tai chua
         List<Alarm> listAlarmCheck = AlarmDatabase.getInstance(context).alarmDAO().checkAlarmFromTime(alarmNew.getTime());

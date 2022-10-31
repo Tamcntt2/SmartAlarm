@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements ItemTouchHelperLi
             PendingIntent pendingIntent = PendingIntent.getBroadcast(
                     MainActivity.this, alarm.getId(), intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE
             );
-            alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         }
 
         @Override
