@@ -2,6 +2,7 @@ package com.example.smartalarm.activity;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -82,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements ItemTouchHelperLi
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         intent = new Intent(MainActivity.this, AlarmReceiver.class);
         ringtoneUtils = new RingtoneUtils(this);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         // recycler view
         rcvAlarm = (RecyclerView) findViewById(R.id.recycleViewAlarm);
