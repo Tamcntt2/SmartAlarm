@@ -59,7 +59,7 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.AnswersV
 
                     if(idAlarm != -1) {
                         Alarm alarm = AlarmDatabase.getInstance(context).alarmDAO().checkAlarmFromId(idAlarm).get(0);
-                        alarm.setEnabled(false);
+                        if(!alarm.getRepeat()) alarm.setEnabled(false);
                         AlarmDatabase.getInstance(context).alarmDAO().updateAlarm(alarm);
                     }
 

@@ -409,7 +409,6 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         List<Alarm> listAlarmCheck = AlarmDatabase.getInstance(context).alarmDAO().checkAlarmFromTimeOfDay(alarm.getTimeOfDay());
         if (!listAlarmCheck.isEmpty()) {
             deleteItem(listAlarmCheck.get(0));
-//            Toast.makeText(context, "Delete success!", Toast.LENGTH_SHORT).show();
         }
 
         // update

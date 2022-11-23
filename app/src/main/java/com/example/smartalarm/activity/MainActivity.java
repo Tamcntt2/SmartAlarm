@@ -121,15 +121,9 @@ public class MainActivity extends AppCompatActivity implements ItemTouchHelperLi
 
         @Override
         public void ICancelItemAlarmManager(Alarm alarm) {
-            // check repeat
-            if (alarm.getRepeat()) {
-                alarmManager.cancel(PendingIntent.getBroadcast(
-                        MainActivity.this, alarm.getId(), intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE
-                ));
-            } else {
-                // ...
-            }
-
+            alarmManager.cancel(PendingIntent.getBroadcast(
+                    MainActivity.this, alarm.getId(), intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE
+            ));
         }
     };
 
@@ -137,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements ItemTouchHelperLi
         DateFormat formatter = new SimpleDateFormat("EEE", Locale.getDefault());
         String dateCurrent = formatter.format(calendar.getTime());
 
-        while(dateCurrent.compareTo(key) != 0) {
+        while (dateCurrent.compareTo(key) != 0) {
             calendar.add(Calendar.DAY_OF_MONTH, 1);
             dateCurrent = formatter.format(calendar.getTime());
         }
