@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -34,7 +35,9 @@ import com.example.smartalarm.util.RingtoneUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +52,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
 
     public AlarmAdapter(Context context, IAlarmManager iAlarmManager, RingtoneUtils ringtoneUtils) {
         this.context = context;
-        this.listAlarm = new ArrayList<>(AlarmDatabase.getInstance(context).alarmDAO().getListAlarm());
+        listAlarm = AlarmDatabase.getInstance(context).alarmDAO().getListAlarm();
         this.iAlarmManager = iAlarmManager;
         this.ringtoneUtils = ringtoneUtils;
     }
@@ -75,13 +78,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
             hour = "00" + hour.substring(2, 8);
         }
         holder.tvHour.setText(hour);
-
-        String[] DAY_OF_WEEKS = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-        int idDay = calendar.get(Calendar.DAY_OF_WEEK) - 1;
-        String day = DAY_OF_WEEKS[idDay] + ", ";
-        SimpleDateFormat formatDay = new SimpleDateFormat("dd-MM");
-        day += formatDay.format(calendar.getTime());
-        holder.tvDay.setText(day);
+        holder.tvRepeat.setText(alarm.getTitleRepeat());
 
         // update isEnabled
         holder.imgStatus.setImageResource(alarm.isEnabled() ? R.drawable.clock_enable : R.drawable.clock_disable);
@@ -127,13 +124,13 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         dialog.setContentView(R.layout.dialog_add_alarm);
         dialog.show();
 
-        // set timePicker
+        // init timePicker
         TimePicker timePicker = (TimePicker) dialog.findViewById(R.id.timePicker);
         Calendar calendar = AlarmConverter.toCalendar(alarm.getTime());
         timePicker.setHour(calendar.get(Calendar.HOUR_OF_DAY));
         timePicker.setMinute(calendar.get(Calendar.MINUTE));
 
-        // set spinner
+        // init spinner
         Spinner spinner = (Spinner) dialog.findViewById(R.id.spinnerRingtone);
         ringtoneAdapter = new RingtoneAdapter(context, R.layout.item_ringtone, ringtoneUtils.getListRingtone());
         spinner.setAdapter(ringtoneAdapter);
@@ -158,6 +155,17 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
 
+            }
+        });
+
+        // init repeat
+        TextView tvTitleRepeat = (TextView) dialog.findViewById(R.id.titleRepeat);
+        tvTitleRepeat.setText(alarm.getTitleRepeat());
+        RelativeLayout layoutRepeat = dialog.findViewById(R.id.layoutRepeat);
+        layoutRepeat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showDialogAddRepeat(tvTitleRepeat, alarm);
             }
         });
 
@@ -186,6 +194,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
                 calendarSelected.set(Calendar.MILLISECOND, 0);
 
                 alarm.setTime(AlarmConverter.fromCalendar(calendarSelected));
+                alarm.setTimeOfDay(calendarSelected.get(Calendar.HOUR_OF_DAY) * 60 + calendarSelected.get(Calendar.MINUTE));
                 alarm.setEnabled(true);
                 updateItem(alarm);
                 notifyDataSetChanged();
@@ -193,6 +202,88 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
                 if (ringtoneSelected.isPlaying()) {
                     ringtoneSelected.stop();
                 }
+                dialog.dismiss();
+            }
+        });
+    }
+
+    private void showDialogAddRepeat(TextView tvTitleRepeat, Alarm alarm) {
+        Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.dialog_add_repeat);
+        dialog.show();
+
+        List<Boolean> week = new ArrayList<>(Arrays.asList(new Boolean[7]));
+        Collections.fill(week, Boolean.FALSE);
+
+        CheckBox cbMonday = dialog.findViewById(R.id.checkBoxMonday);
+        CheckBox cbTuesday = dialog.findViewById(R.id.checkBoxTuesday);
+        CheckBox cbWednesday = dialog.findViewById(R.id.checkBoxWednesday);
+        CheckBox cbThursday = dialog.findViewById(R.id.checkBoxThursday);
+        CheckBox cbFriday = dialog.findViewById(R.id.checkBoxFriday);
+        CheckBox cbSaturday = dialog.findViewById(R.id.checkBoxSaturday);
+        CheckBox cbSunday = dialog.findViewById(R.id.checkBoxSunday);
+
+        // init checkbox
+        String titleTmp = alarm.getTitleRepeat();
+        if (titleTmp.compareTo("Never") != 0) {
+
+            if (titleTmp.compareTo("Every day") == 0) {
+                cbMonday.setChecked(true);
+                cbTuesday.setChecked(true);
+                cbWednesday.setChecked(true);
+                cbThursday.setChecked(true);
+                cbFriday.setChecked(true);
+                cbSaturday.setChecked(true);
+                cbSunday.setChecked(true);
+            } else if (titleTmp.compareTo("Every weekday") == 0) {
+                cbMonday.setChecked(true);
+                cbTuesday.setChecked(true);
+                cbWednesday.setChecked(true);
+                cbThursday.setChecked(true);
+                cbFriday.setChecked(true);
+            } else {
+                String arrOfStr[] = titleTmp.split(" ");
+                String weekTmp[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+                Map<String, Boolean> map = new HashMap<String, Boolean>();
+                for (int i = 0; i < 7; i++) {
+                    map.put(weekTmp[i], false);
+                }
+                for (int i = 0; i < arrOfStr.length; i++) {
+                    map.put(arrOfStr[i], true);
+                }
+                cbMonday.setChecked(map.get("Mon"));
+                cbTuesday.setChecked(map.get("Tue"));
+                cbWednesday.setChecked(map.get("Wed"));
+                cbThursday.setChecked(map.get("Thu"));
+                cbFriday.setChecked(map.get("Fri"));
+                cbSaturday.setChecked(map.get("Sat"));
+                cbSunday.setChecked(map.get("Sun"));
+            }
+        }
+
+        ImageView btnBack = (ImageView) dialog.findViewById(R.id.buttonBack);
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        ImageView btnSave = (ImageView) dialog.findViewById(R.id.buttonSave);
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                week.set(0, cbMonday.isChecked());
+                week.set(1, cbTuesday.isChecked());
+                week.set(2, cbWednesday.isChecked());
+                week.set(3, cbThursday.isChecked());
+                week.set(4, cbFriday.isChecked());
+                week.set(5, cbSaturday.isChecked());
+                week.set(6, cbSunday.isChecked());
+
+                String title = AlarmConverter.toTitlefromListWeekRepeat(week);
+                tvTitleRepeat.setText(title);
+                alarm.setTitleRepeat(title);
                 dialog.dismiss();
             }
         });
@@ -216,7 +307,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
 
     public class AlarmViewHolder extends RecyclerView.ViewHolder {
         TextView tvHour;
-        TextView tvDay;
+        TextView tvRepeat;
         ImageView imgStatus;
         public RelativeLayout layoutForeground;
         public RelativeLayout layoutBackground;
@@ -226,7 +317,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
             super(itemView);
 
             tvHour = (TextView) itemView.findViewById(R.id.textViewHour);
-            tvDay = (TextView) itemView.findViewById(R.id.textViewDay);
+            tvRepeat = (TextView) itemView.findViewById(R.id.textViewRepeat);
             imgStatus = (ImageView) itemView.findViewById(R.id.imageViewStatus);
             layoutForeground = (RelativeLayout) itemView.findViewById(R.id.layoutForeground);
             layoutBackground = (RelativeLayout) itemView.findViewById(R.id.layoutBackground);
@@ -244,39 +335,24 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         return position;
     }
 
-    private Alarm compareTimeCurrent(Alarm alarmNew) {
-        // kiem tra -> tang ngay
-        Calendar calendarNew = AlarmConverter.toCalendar(alarmNew.getTime());
-        Date dateNew = calendarNew.getTime();
-        Calendar calendarCurrent = Calendar.getInstance();
-        Date dateCurrent = calendarCurrent.getTime();
-        if (dateCurrent.compareTo(dateNew) > 0) {
-            calendarNew.add(Calendar.DAY_OF_MONTH, 1);
-            alarmNew.setTime(AlarmConverter.fromCalendar(calendarNew));
-        }
-
-        return alarmNew;
-    }
-
     public void addItem(Alarm alarmNew) {
         alarmNew = compareTimeCurrent(alarmNew);
 
         Calendar cal = AlarmConverter.toCalendar(alarmNew.getTime());
         Log.d("Time Alarm Add", cal.get(Calendar.HOUR) + "-" + cal.get(Calendar.MINUTE) + "-" + cal.get(Calendar.SECOND) + "-" + cal.get(Calendar.MILLISECOND));
 
-
-        // kiem tra ton tai chua
-        List<Alarm> listAlarmCheck = AlarmDatabase.getInstance(context).alarmDAO().checkAlarmFromTime(alarmNew.getTime());
+        // kiem tra time ton tai chua
+        List<Alarm> listAlarmCheck = AlarmDatabase.getInstance(context).alarmDAO().checkAlarmFromTimeOfDay(alarmNew.getTimeOfDay());
         if (listAlarmCheck.isEmpty()) {
             // chua ton tai -> add room, list, alarm manager
             AlarmDatabase.getInstance(context).alarmDAO().insertAlarm(alarmNew);
 
-            listAlarmCheck = AlarmDatabase.getInstance(context).alarmDAO().checkAlarmFromTime(alarmNew.getTime());
+            listAlarmCheck = AlarmDatabase.getInstance(context).alarmDAO().checkAlarmFromTimeOfDay(alarmNew.getTimeOfDay());
             alarmNew.setId(listAlarmCheck.get(0).getId());
 
             int position = 0;
             for (int i = 0; i < listAlarm.size(); i++) {
-                if (listAlarm.get(i).getTime().compareTo(alarmNew.getTime()) < 0) {
+                if (listAlarm.get(i).getTimeOfDay() < alarmNew.getTimeOfDay()) {
                     position = i + 1;
                 } else {
                     break;
@@ -290,6 +366,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
             int position = findPositionFromIdAlarm(listAlarmCheck.get(0).getId());
             Alarm alarmSelected = listAlarm.get(position);
             alarmSelected.setRingtoneTitle(alarmNew.getRingtoneTitle());
+            alarmSelected.setTitleRepeat(alarmNew.getTitleRepeat());
             alarmSelected.setEnabled(true);
             listAlarm.set(position, alarmSelected);
 
@@ -311,13 +388,28 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         iAlarmManager.ICancelItemAlarmManager(alarm);
     }
 
+    private Alarm compareTimeCurrent(Alarm alarmNew) {
+        // kiem tra -> tang ngay
+        Calendar calendarNew = AlarmConverter.toCalendar(alarmNew.getTime());
+        Date dateNew = calendarNew.getTime();
+        Calendar calendarCurrent = Calendar.getInstance();
+        Date dateCurrent = calendarCurrent.getTime();
+        if (dateCurrent.compareTo(dateNew) > 0) {
+            calendarNew.add(Calendar.DAY_OF_MONTH, 1);
+            alarmNew.setTime(AlarmConverter.fromCalendar(calendarNew));
+        }
+
+        return alarmNew;
+    }
+
     public void updateItem(Alarm alarm) {
         alarm = compareTimeCurrent(alarm);
 
         // Kiem tra time: da ton tai -> xoa alarm cu
-        List<Alarm> listAlarmCheck = AlarmDatabase.getInstance(context).alarmDAO().checkAlarmFromTime(alarm.getTime());
+        List<Alarm> listAlarmCheck = AlarmDatabase.getInstance(context).alarmDAO().checkAlarmFromTimeOfDay(alarm.getTimeOfDay());
         if (!listAlarmCheck.isEmpty()) {
             deleteItem(listAlarmCheck.get(0));
+//            Toast.makeText(context, "Delete success!", Toast.LENGTH_SHORT).show();
         }
 
         // update
@@ -328,13 +420,15 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
 
         int positionNew = 0;
         for (int i = 0; i < listAlarm.size(); i++) {
-            if (listAlarm.get(i).getTime().compareTo(alarm.getTime()) < 0) {
-                position = i + 1;
+            if (listAlarm.get(i).getTimeOfDay() <= alarm.getTimeOfDay()) {
+                positionNew = i + 1;
             } else {
                 break;
             }
         }
-        listAlarm.add(position, alarm);
+        listAlarm.add(positionNew, alarm);
+        notifyItemChanged(positionNew);
+
 
         iAlarmManager.IAddItemAlarmManager(alarm);
     }

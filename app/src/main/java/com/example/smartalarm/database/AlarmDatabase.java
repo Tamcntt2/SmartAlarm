@@ -17,7 +17,7 @@ import com.example.smartalarm.model.Alarm;
 @Database(entities = {Alarm.class}, version = 1)
 @TypeConverters({AlarmConverter.class})
 public abstract class AlarmDatabase extends RoomDatabase {
-    private static final String DATABASE_NAME = "listAlarm05.db";
+    private static final String DATABASE_NAME = "listAlarm10.db";
     private static AlarmDatabase instance;
 
     public static synchronized AlarmDatabase getInstance(Context context) {

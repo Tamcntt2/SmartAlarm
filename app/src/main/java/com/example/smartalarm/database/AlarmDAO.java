@@ -16,11 +16,11 @@ public interface AlarmDAO {
     @Insert
     void insertAlarm(Alarm alarm);
 
-    @Query("SELECT * FROM alarm ORDER BY time")
+    @Query("SELECT * FROM alarm ORDER BY timeOfDay")
     List<Alarm> getListAlarm();
 
-    @Query("SELECT * FROM alarm WHERE time= :time")
-    List<Alarm> checkAlarmFromTime(String time);
+    @Query("SELECT * FROM alarm WHERE timeOfDay= :timeOfDay")
+    List<Alarm> checkAlarmFromTimeOfDay(long timeOfDay);
 
     @Query("SELECT * FROM alarm WHERE id= :id")
     List<Alarm> checkAlarmFromId(int id);

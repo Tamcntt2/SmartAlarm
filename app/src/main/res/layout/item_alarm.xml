@@ -39,13 +39,13 @@
         android:textSize="20dp"
         android:textStyle="bold" />
 
-    <TextView
-        android:textColor="@android:color/darker_gray"
-        android:id="@+id/textViewDay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textViewHour"
-        android:text="Chủ nhật, 16-10" />
+        <TextView
+            android:id="@+id/textViewRepeat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textViewHour"
+            android:text="Alarm"
+            android:textColor="@android:color/darker_gray" />
 
     <ImageView
         android:id="@+id/imageViewStatus"
